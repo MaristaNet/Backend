@@ -18,4 +18,20 @@ router.get('/', async (req, res) => {
         res.status(500).json(error.message)
     }
 })
+
+router.get('/:id', async (req, res) => {
+    try {
+        const doc = await db.collection('post').doc(req.params.id).get();
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Post no encontrado' });
+        }
+        return res.status(200).json({
+            id: doc.id,
+            ...doc.data(),
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
