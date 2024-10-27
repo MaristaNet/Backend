@@ -17,9 +17,8 @@ router.get('/', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+})
 
-// Obtener un post por ID
 router.get('/:id', async (req, res) => {
     try {
         const doc = await db.collection('post').doc(req.params.id).get();
