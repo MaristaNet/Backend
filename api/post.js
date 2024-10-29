@@ -4,8 +4,23 @@ const router = express.Router();
 const db = admin.firestore();
 
 router.get('/', async (req, res) => {
+
     try {
-        const snapshot = await db.collection('post').get();
+        const {usuario,etiqueta,privacidad} = req.query;
+        let consulta = db.collection('post');
+        if(usuario){
+            consulta = consulta.where('usuario','==',usuario);
+        }
+        if(etiqueta){
+            if (etiqueta !=='ayuda'&&etiqueta !=='academico'){
+                return res.status(400).json({ error: 'Etiqueta incorrecta' });
+            }
+            consulta = consulta.where('etiqueta','==',etiqueta);
+        }
+        if(privacidad){
+           consulta = consulta.where('privacidad','==',privacidad);
+        }
+        const snapshot = await consulta.get();
         const posts = [];
         snapshot.forEach((doc) => {
             posts.push({
@@ -13,7 +28,7 @@ router.get('/', async (req, res) => {
                 ...doc.data(),
             });
         });
-        res.status(200).json(posts);
+        res.status(200).json({data:posts, total:posts.length});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
