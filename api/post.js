@@ -2,23 +2,24 @@ const admin = require('firebase-admin');
 const express = require('express');
 const router = express.Router();
 const db = admin.firestore();
+const { TStoDate } = require('../utils/utils')
 
 router.get('/', async (req, res) => {
 
     try {
-        const {usuario,etiqueta,privacidad} = req.query;
+        const { usuario, etiqueta, privacidad } = req.query;
         let consulta = db.collection('post');
-        if(usuario){
-            consulta = consulta.where('usuario','==',usuario);
+        if (usuario) {
+            consulta = consulta.where('usuario', '==', usuario);
         }
-        if(etiqueta){
-            if (etiqueta !=='ayuda'&&etiqueta !=='academico'){
+        if (etiqueta) {
+            if (etiqueta !== 'ayuda' && etiqueta !== 'academico') {
                 return res.status(400).json({ error: 'Etiqueta incorrecta' });
             }
-            consulta = consulta.where('etiqueta','==',etiqueta);
+            consulta = consulta.where('etiqueta', '==', etiqueta);
         }
-        if(privacidad){
-           consulta = consulta.where('privacidad','==',privacidad);
+        if (privacidad) {
+            consulta = consulta.where('privacidad', '==', privacidad);
         }
         const snapshot = await consulta.get();
         const posts = [];
@@ -28,7 +29,10 @@ router.get('/', async (req, res) => {
                 ...doc.data(),
             });
         });
-        res.status(200).json({data:posts, total:posts.length});
+        posts.forEach((posts) => {
+            posts.fecha_publicacion = TStoDate(posts.fecha_publicacion)
+        });
+        res.status(200).json({ data: posts, total: posts.length });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -40,10 +44,9 @@ router.get('/:id', async (req, res) => {
         if (!doc.exists) {
             return res.status(404).json({ message: 'Post no encontrado' });
         }
-        return res.status(200).json({
-            id: doc.id,
-            ...doc.data(),
-        });
+        const post = { id: doc.id, ...doc.data() };
+        post.fecha_publicacion = TStoDate(post.fecha_publicacion);
+        return res.status(200).json(post);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -54,15 +57,17 @@ router.post('/', async (req, res) => {
     const { contenido, etiqueta, fecha_publicacion, imagen, privacidad, usuario } = req.body;
 
     // Validar que los datos requeridos estén presentes
-    if (!contenido || !etiqueta || !fecha_publicacion || !imagen || !privacidad || !usuario) {
+    if (!contenido || !etiqueta || !imagen || !privacidad || !usuario) {
         return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
     try {
+        const fecha_publicacion = new Date();
+        const timestamp = admin.firestore.Timestamp.fromDate(fecha_publicacion);
         const newPost = {
             contenido,
             etiqueta,
-            fecha_publicacion,
+            fecha_publicacion: timestamp,
             imagen,
             privacidad,
             usuario,

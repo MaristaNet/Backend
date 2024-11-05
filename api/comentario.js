@@ -5,36 +5,35 @@ const router = express.Router()
 const db = admin.firestore()
 
 router.get('/', async (req, res) => {
-    try{
-    const snapshot = await db.collection('comentario').get()
-    const comentario = []
-    snapshot.forEach((doc) => {
-        comentario.push({
-            id: doc.id,
-            ...doc.data()
+    try {
+        const snapshot = await db.collection('comentario').get()
+        const comentario = []
+        snapshot.forEach((doc) => {
+            comentario.push({
+                id: doc.id,
+                ...doc.data()
+            })
         })
-    })
-    //convertir timestamp a fecha de cada elemento de comentario
-    comentario.forEach((comentario) => {
-        comentario.fecha_publicacion = TStoDate(comentario.fecha_publicacion)
-    })
-    res.status(200).json(comentario)
-    }catch(error){
+        //convertir timestamp a fecha de cada elemento de comentario
+        comentario.forEach((comentario) => {
+            comentario.fecha_publicacion = TStoDate(comentario.fecha_publicacion)
+        })
+        res.status(200).json(comentario)
+    } catch (error) {
         res.status(500).json(error.message)
     }
 })
 
 router.get('/:id', async (req, res) => {
-    try{
-    const doc = await db.collection('comentario').doc(req.params.id).get()
-    if(!doc.exists){
-       return res.status(404).json({message: 'Comentario no encontrado'})
-    }
-    return res.status(200).json({
-        id: doc.id,
-        ...doc.data()
-    })
-    }catch(error){
+    try {
+        const doc = await db.collection('comentario').doc(req.params.id).get()
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Comentario no encontrado' })
+        }
+        const comentario = { id: doc.id, ...doc.data(), };
+        comentario.fecha_publicacion = TStoDate(comentario.fecha_publicacion);
+        return res.status(200).json(comentario);
+    } catch (error) {
         res.status(500).json(error.message)
     }
 })
