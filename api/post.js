@@ -4,22 +4,24 @@ const router = express.Router();
 const db = admin.firestore();
 
 router.get('/', async (req, res) => {
-
     try {
-        const {usuario,etiqueta,privacidad} = req.query;
+        const { usuario, etiqueta, privacidad } = req.query;
         let consulta = db.collection('post');
-        if(usuario){
-            consulta = consulta.where('usuario','==',usuario);
+
+        if (usuario) {
+            consulta = consulta.where('usuario', '==', usuario);
         }
-        if(etiqueta){
-            if (etiqueta !=='ayuda'&&etiqueta !=='academico'){
+        if (etiqueta) {
+            const etiquetasValidas = ['ayuda', 'convivencia', 'academico'];
+            if (!etiquetasValidas.includes(etiqueta)) {
                 return res.status(400).json({ error: 'Etiqueta incorrecta' });
             }
-            consulta = consulta.where('etiqueta','==',etiqueta);
+            consulta = consulta.where('etiqueta', '==', etiqueta);
         }
-        if(privacidad){
-           consulta = consulta.where('privacidad','==',privacidad);
+        if (privacidad) {
+            consulta = consulta.where('privacidad', '==', privacidad);
         }
+
         const snapshot = await consulta.get();
         const posts = [];
         snapshot.forEach((doc) => {
@@ -28,11 +30,12 @@ router.get('/', async (req, res) => {
                 ...doc.data(),
             });
         });
-        res.status(200).json({data:posts, total:posts.length});
+
+        res.status(200).json({ data: posts, total: posts.length });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-})
+});
 
 router.get('/:id', async (req, res) => {
     try {
@@ -78,13 +81,7 @@ router.post('/', async (req, res) => {
 
 // Actualizar un post por ID
 router.patch('/:id', async (req, res) => {
-    const { contenido, etiqueta, fecha_publicacion, imagen, privacidad, usuario } = req.body;
-
-    // Validar que los datos requeridos estén presentes
-    if (!contenido || !etiqueta || !fecha_publicacion || !imagen || !privacidad || !usuario) {
-        return res.status(400).json({ error: 'Faltan datos obligatorios' });
-    }
-
+    const { contenido, etiqueta, imagen, privacidad } = req.body; // Excluir `fecha_publicacion` y `usuario`
     try {
         const docRef = db.collection('post').doc(req.params.id);
         const doc = await docRef.get();
@@ -92,16 +89,11 @@ router.patch('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Post no encontrado' });
         }
 
-        await docRef.update({
-            contenido,
-            etiqueta,
-            fecha_publicacion,
-            imagen,
-            privacidad,
-            usuario,
-        });
+        // Solo actualiza los campos permitidos
+        const updateData = { contenido, etiqueta, imagen, privacidad };
+        await docRef.update(updateData);
 
-        res.status(200).json({ id: req.params.id, contenido, etiqueta, fecha_publicacion, imagen, privacidad, usuario });
+        res.status(200).json({ id: req.params.id, ...updateData });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

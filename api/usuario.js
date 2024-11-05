@@ -83,42 +83,19 @@ router.post('/', async (req, res) => {
 
 
 router.patch('/:id', async (req, res) => {
-    const { presentacion, foto, post, fecha_creacion, nombre, email, pronombres, username, contactos, carrera } = req.body;
-    if (!presentacion || !foto || !post || !fecha_creacion || !nombre || !email || !pronombres || !username || !contactos || !carrera) {
-        return res.status(400).json({ error: 'Faltan datos' });
-    }
+    const { presentacion, foto, post, nombre, pronombres, username, contactos, carrera } = req.body;
     try {
         const docRef = db.collection('usuario').doc(req.params.id);
         const doc = await docRef.get();
         if (!doc.exists) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
-        const timestamp = new admin.firestore.Timestamp(fecha_creacion._seconds, fecha_creacion._nanoseconds);
-        await docRef.update({
-            presentacion: presentacion,
-            foto: foto,
-            post: post, 
-            fecha_creacion: timestamp, 
-            nombre: nombre,
-            email: email,
-            pronombres: pronombres,
-            username: username,
-            contactos: contactos, 
-            carrera: carrera, 
-        });
-        res.status(200).json({
-            id: req.params.id,
-            presentacion,
-            foto,
-            post,
-            fecha_creacion,
-            nombre,
-            email,
-            pronombres,
-            username,
-            contactos,
-            carrera
-        });
+
+        // Solo actualiza los campos permitidos
+        const updateData = { presentacion, foto, post, nombre, pronombres, username, contactos, carrera };
+        await docRef.update(updateData);
+
+        res.status(200).json({ id: req.params.id, ...updateData });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
