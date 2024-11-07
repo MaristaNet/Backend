@@ -35,16 +35,69 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    if (!req.body.nombre) {
+    const { nombre, clave } = req.body;
+
+    if (!nombre || !clave) {
         return res.status(400).json({ error: 'Faltan datos' });
     }
-    try {
-        const snapshot = await db.collection('carrera').get();
 
-        await db.collection('carrera').add({
-            nombre: req.body.nombre,
+    try {
+        const nuevoDocumento = await db.collection('carreras').add({
+            nombre,
+            clave
         });
-        res.status(201).json({ nombre: req.body.nombre });
+
+        res.status(201).json({
+            id: nuevoDocumento.id,
+            nombre,
+            clave
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.patch('/:id', async (req, res) => {
+    const { nombre, clave } = req.body;
+
+    if (!nombre || !clave) {
+        return res.status(400).json({ error: 'Faltan datos' });
+    }
+
+    try {
+        const docRef = db.collection('carreras').doc(req.params.id);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Carrera no encontrada' });
+        }
+
+        await docRef.update({
+            nombre,
+            clave
+        });
+
+        res.status(200).json({
+            id: req.params.id,
+            nombre,
+            clave
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const docRef = db.collection('carreras').doc(req.params.id);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Carrera no encontrada' });
+        }
+
+        await docRef.delete();
+        res.status(200).json({ message: 'Carrera eliminada' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

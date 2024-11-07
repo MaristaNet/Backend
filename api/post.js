@@ -52,16 +52,18 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Crear un nuevo post
 router.post('/', async (req, res) => {
-    const { contenido, etiqueta, fecha_publicacion, imagen, privacidad, usuario } = req.body;
+    const { contenido, etiqueta, imagen, privacidad, usuario } = req.body;
 
     // Validar que los datos requeridos estén presentes
-    if (!contenido || !etiqueta || !fecha_publicacion || !imagen || !privacidad || !usuario) {
+    if (!contenido || !etiqueta || !imagen || !privacidad || !usuario) {
         return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
     try {
+        // Generar un timestamp en el momento de la creación del post
+        const fecha_publicacion = admin.firestore.Timestamp.now();
+
         const newPost = {
             contenido,
             etiqueta,
@@ -89,8 +91,25 @@ router.patch('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Post no encontrado' });
         }
 
-        // Solo actualiza los campos permitidos
-        const updateData = { contenido, etiqueta, imagen, privacidad };
+        // Creamos un objeto vacío para almacenar los cambios
+        const updateData = {};
+
+        // Condiciones para actualizar los campos
+        if (contenido !== undefined) {
+            updateData.contenido = contenido;
+        }
+        if (etiqueta !== undefined) {
+            updateData.etiqueta = etiqueta;
+        }
+        if (imagen !== undefined) {
+            // Si la imagen es null, la asignamos explícitamente como null
+            updateData.imagen = imagen === null ? null : imagen;
+        }
+        if (privacidad !== undefined) {
+            updateData.privacidad = privacidad;
+        }
+
+        // Actualiza los campos 
         await docRef.update(updateData);
 
         res.status(200).json({ id: req.params.id, ...updateData });
@@ -98,6 +117,28 @@ router.patch('/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Actualizar solo la imagen de un post por ID
+router.patch('/:id', async (req, res) => {
+    const { imagen } = req.body;  
+    try {
+        const docRef = db.collection('post').doc(req.params.id);
+        const doc = await docRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Post no encontrado' });
+        }
+
+        // Actualiza el campo de imagen
+        if (imagen) {
+            await docRef.update({ imagen });  
+        }
+
+        res.status(200).json({ id: req.params.id, imagen });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 // Eliminar un post por ID
 router.delete('/:id', async (req, res) => {
