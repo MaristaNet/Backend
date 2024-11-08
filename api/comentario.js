@@ -73,6 +73,7 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Actualizar un comentario por ID
 router.patch('/:id', async (req, res) => {
     const { comentario, imagen, privacidad } = req.body;
     try {
@@ -82,11 +83,63 @@ router.patch('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Comentario no encontrado' });
         }
 
-        // Solo permite actualizar los campos permitidos
-        const updateData = { comentario, imagen, privacidad };
+        // Creamos un objeto vacío para almacenar los cambios
+        const updateData = {};
+
+        // Solo actualiza los campos que han sido proporcionados
+        if (comentario !== undefined) {
+            updateData.comentario = comentario;
+        }
+        if (imagen !== undefined) {
+            // Si la imagen es null, asignamos null explícitamente
+            updateData.imagen = imagen === null ? null : imagen;
+        }
+        if (privacidad !== undefined) {
+            updateData.privacidad = privacidad;
+        }
+
+        // Realiza la actualización 
         await docRef.update(updateData);
 
         res.status(200).json({ id: req.params.id, ...updateData });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+router.patch('/:id', async (req, res) => {
+    const { imagen } = req.body;  // Solo obtenemos el campo de imagen
+    try {
+        const docRef = db.collection('comentario').doc(req.params.id);
+        const doc = await docRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Comentario no encontrado' });
+        }
+
+        // Actualizar el campo de imagen
+        if (imagen) {
+            await docRef.update({ imagen }); 
+        }
+
+        res.status(200).json({ id: req.params.id, imagen });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const docRef = db.collection('comentarios').doc(req.params.id);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Comentario no encontrado' });
+        }
+
+        await docRef.delete();
+        res.status(200).json({ message: 'Comentario eliminado' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
