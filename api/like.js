@@ -1,7 +1,8 @@
-const admin = require('firebase-admin');
-const express = require('express');
-const router = express.Router();
-const db = admin.firestore();
+const admin = require('firebase-admin')
+const express = require('express')
+const router = express.Router()
+const db = admin.firestore()
+const { TStoDate } = require('../utils/utils')
 
 // Obtener todos los likes con filtrado opcional por usuario, id_comentario o id_post
 router.get('/', async (req, res) => {
@@ -26,10 +27,11 @@ router.get('/', async (req, res) => {
         snapshot.forEach((doc) => {
             likes.push({
                 id: doc.id,
-                ...doc.data()
+                ...doc.data(),
+                fecha: TStoDate(doc.data().fecha)
             });
         });
-        
+
         // Si el usuario solicita el total de likes, enviar el conteo 
         if (total) {
             return res.status(200).json({ total: likes.length });
@@ -50,7 +52,8 @@ router.get('/:id', async (req, res) => {
         }
         return res.status(200).json({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
+            fecha: TStoDate(doc.data().fecha)
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

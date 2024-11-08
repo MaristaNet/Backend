@@ -36,10 +36,9 @@ router.get('/:id', async (req, res) => {
         if (!doc.exists) {
             return res.status(404).json({ message: 'Comentario no encontrado' });
         }
-        return res.status(200).json({
-            id: doc.id,
-            ...doc.data()
-        });
+        const comentario = { id: doc.id, ...doc.data(), };
+        comentario.fecha_publicacion = TStoDate(comentario.fecha_publicacion);
+        return res.status(200).json(comentario);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

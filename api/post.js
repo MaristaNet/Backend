@@ -2,6 +2,7 @@ const admin = require('firebase-admin');
 const express = require('express');
 const router = express.Router();
 const db = admin.firestore();
+const { TStoDate } = require('../utils/utils')
 
 router.get('/', async (req, res) => {
     try {
@@ -30,7 +31,9 @@ router.get('/', async (req, res) => {
                 ...doc.data(),
             });
         });
-
+        posts.forEach((posts) => {
+            posts.fecha_publicacion = TStoDate(posts.fecha_publicacion)
+        });
         res.status(200).json({ data: posts, total: posts.length });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -43,10 +46,9 @@ router.get('/:id', async (req, res) => {
         if (!doc.exists) {
             return res.status(404).json({ message: 'Post no encontrado' });
         }
-        return res.status(200).json({
-            id: doc.id,
-            ...doc.data(),
-        });
+        const post = { id: doc.id, ...doc.data() };
+        post.fecha_publicacion = TStoDate(post.fecha_publicacion);
+        return res.status(200).json(post);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -61,13 +63,12 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Generar un timestamp en el momento de la creación del post
-        const fecha_publicacion = admin.firestore.Timestamp.now();
-
+        const fecha_publicacion = new Date();
+        const timestamp = admin.firestore.Timestamp.fromDate(fecha_publicacion);
         const newPost = {
             contenido,
             etiqueta,
-            fecha_publicacion,
+            fecha_publicacion: timestamp,
             imagen,
             privacidad,
             usuario,

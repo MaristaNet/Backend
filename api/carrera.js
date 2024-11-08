@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     })
     res.status(200).json(carrera)
     }catch(error){
-        res.status(500).json(error.message)
+        res.status(500).json({error:error.message})
     }
 })
 
@@ -30,7 +30,7 @@ router.get('/:id', async (req, res) => {
         ...doc.data()
     })
     }catch(error){
-        res.status(500).json(error.message)
+        res.status(500).json({error:error.message})
     }
 })
 
