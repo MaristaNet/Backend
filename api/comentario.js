@@ -131,7 +131,7 @@ router.patch('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
-        const docRef = db.collection('comentarios').doc(req.params.id);
+        const docRef = db.collection('comentario').doc(req.params.id);
         const doc = await docRef.get();
 
         if (!doc.exists) {

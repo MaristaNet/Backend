@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const nuevoDocumento = await db.collection('carreras').add({
+        const nuevoDocumento = await db.collection('carrera').add({
             nombre,
             clave
         });
@@ -65,7 +65,7 @@ router.patch('/:id', async (req, res) => {
     }
 
     try {
-        const docRef = db.collection('carreras').doc(req.params.id);
+        const docRef = db.collection('carrera').doc(req.params.id);
         const doc = await docRef.get();
 
         if (!doc.exists) {
@@ -89,7 +89,7 @@ router.patch('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
-        const docRef = db.collection('carreras').doc(req.params.id);
+        const docRef = db.collection('carrera').doc(req.params.id);
         const doc = await docRef.get();
 
         if (!doc.exists) {
