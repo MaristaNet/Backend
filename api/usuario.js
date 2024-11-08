@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 
 
 
-    res.status(200).json(usuario)
+    res.status(200).json({data: usuario, total: usuario.length})
     }catch(error){
         res.status(500).json(error.message)
     }

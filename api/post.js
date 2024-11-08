@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
             consulta = consulta.where('usuario', '==', usuario);
         }
         if (etiqueta) {
-            const etiquetasValidas = ['ayuda', 'convivencia', 'academico'];
+            const etiquetasValidas = ['ayuda', 'convivencia', 'academico','empleos'];
             if (!etiquetasValidas.includes(etiqueta)) {
                 return res.status(400).json({ error: 'Etiqueta incorrecta' });
             }
