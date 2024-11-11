@@ -58,7 +58,7 @@ router.post('/', async (req, res) => {
     const { contenido, etiqueta, imagen, privacidad, usuario } = req.body;
 
     // Validar que los datos requeridos estén presentes
-    if (!contenido || !etiqueta || !imagen || !privacidad || !usuario) {
+    if (!contenido || !etiqueta || !privacidad || !usuario) {
         return res.status(400).json({ error: 'Faltan datos obligatorios' });
     }
 
