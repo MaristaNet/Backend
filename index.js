@@ -49,6 +49,9 @@ app.use('/post', postRouter)
 const usuarioRouter = require('./api/usuario')
 app.use('/usuario', usuarioRouter)
 
+//contacto
+const contactoRouter = require('./api/contacto')
+app.use('/contacto', contactoRouter)
 
 const port = process.env.PORT || 3000
 
