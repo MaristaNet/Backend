@@ -53,6 +53,10 @@ app.use('/usuario', usuarioRouter)
 const contactoRouter = require('./api/contacto')
 app.use('/contacto', contactoRouter)
 
+//denuncia
+const denunciaRouter = require('./api/denuncia')
+app.use('/denunca', denunciaRouter)
+
 const port = process.env.PORT || 3000
 
 app.get('/', (req, res) => {
