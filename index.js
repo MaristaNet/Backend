@@ -55,7 +55,7 @@ app.use('/contacto', contactoRouter)
 
 //denuncia
 const denunciaRouter = require('./api/denuncia')
-app.use('/denunca', denunciaRouter)
+app.use('/denuncia', denunciaRouter)
 
 const port = process.env.PORT || 3000
 

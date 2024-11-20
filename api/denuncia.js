@@ -18,7 +18,9 @@ router.get('/', async (req, res) => {
         const denuncia = [];
         snapshot.forEach((doc) => {
             const data = doc.data();
-            data.fecha_denuncia = TStoDate(data.fecha_denuncia); // Convertir timestamp a fecha
+            if (data.fecha) {
+                data.fecha = TStoDate(data.fecha);
+            }
             denuncia.push({
                 id: doc.id,
                 ...data
@@ -45,7 +47,7 @@ router.post('/', async (req, res) => {
         const nuevaDenuncia = {
             id_elemento,
             tipo,
-            fecha_denuncia: timestamp,
+            fecha: timestamp,
             id_usuario,
             motivo,
         };

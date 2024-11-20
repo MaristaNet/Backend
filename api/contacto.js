@@ -56,6 +56,9 @@ router.post('/nuevo', async (req, res) => {
 router.get('/', async (req, res) => {
     const { id_usuario } = req.query;
 
+    if(!id_usuario){
+        return res.status(400).json({error:'No se especificó el id_usuario, necesario para realizar la busqueda de sus contactos'})
+}
     if (!(await usuarioExiste(id_usuario))) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
     }
