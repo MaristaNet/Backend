@@ -47,17 +47,21 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const { presentacion, foto, post, fecha_creacion, nombre, email, pronombres, username, contactos, carrera } = req.body;
+    const {id, presentacion, foto, post, nombre, email, pronombres, username, contactos, carrera } = req.body;
     //el usuario nos va a dar un id de carrera, nosotros debemos convertirlo en una referencia
-    if (!presentacion || !foto || !post || !fecha_creacion || !nombre || !email || !pronombres || !username || !contactos || !carrera) {
+    if (!presentacion  || !post  || !nombre || !email || !pronombres || !username || !contactos || !carrera) {
         return res.status(400).json({ error: 'Faltan datos' });
     }
 
     try {
         const carreraRef = await getCarreraRef(carrera, db);
+        const fecha_creacion = admin.firestore.Timestamp.now();
         const timestamp = new admin.firestore.Timestamp(fecha_creacion._seconds, fecha_creacion._nanoseconds);
-        await db.collection('usuario').add({
+        //se modifico a .set para que sea consistente la informacion y no se dupliquen los datos
+        //y para efectuar consultas mas agiles
+        await db.collection('usuario').doc(id).set({
             presentacion,
+            id,
             foto,
             post,
             fecha_creacion: timestamp,
@@ -70,6 +74,7 @@ router.post('/', async (req, res) => {
         });
         res.status(201).json({
             presentacion,
+            id,
             foto,
             post,
             fecha_creacion,

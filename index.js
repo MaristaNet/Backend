@@ -1,8 +1,22 @@
 const express = require('express')
+const morgan = require('morgan')
+//ejemplo configuracion CORS, utilizar cuando se realice el deploy
+// const corsOptions = {
+//   origin: 'https://mi-app-react.com',
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+//   allowedHeaders: ['Content-Type', 'API-Key'], 
+//   credentials: true,
+// };
+//
+//app.use(cors(corsOptions));
+
 
 const admin = require('firebase-admin')
 const cors = require('cors')
 require('dotenv').config()
+const { verifyApiKey, generateApiKey } = require('./authorization');
+
+// Configuración de Firebase Admin SDK
 
 const serviceAccount = {
     type: process.env.TYPE,
@@ -23,8 +37,10 @@ admin.initializeApp({
 
 const app = express()
 app.use(cors())
+app.use(morgan('dev'));
 app.use(express.json())
-
+//middleware de verificación de la API Key
+app.use(verifyApiKey);
 //carrear
 const carreraRouter = require('./api/carrera')
 app.use('/carrera', carreraRouter)
@@ -54,7 +70,7 @@ const contactoRouter = require('./api/contacto')
 app.use('/contacto', contactoRouter)
 
 //denuncia
-const denunciaRouter = require('./api/denuncia')
+const denunciaRouter = require('./api/denuncia');
 app.use('/denuncia', denunciaRouter)
 
 const port = process.env.PORT || 3000
