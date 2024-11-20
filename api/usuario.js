@@ -95,7 +95,7 @@ router.post('/', async (req, res) => {
 
 
 router.patch('/:id', async (req, res) => {
-    const { presentacion, foto, post, nombre, pronombres, username, contactos, carrera } = req.body;
+    const { presentacion, foto, nombre, pronombres, username, carrera } = req.body;
     try {
         const docRef = db.collection('usuario').doc(req.params.id);
         const doc = await docRef.get();
@@ -104,7 +104,7 @@ router.patch('/:id', async (req, res) => {
         }
 
         // Solo actualiza los campos permitidos
-        const updateData = { presentacion, foto, post, nombre, pronombres, username, contactos, carrera };
+        const updateData = { presentacion, foto, nombre, pronombres, username, carrera };
         await docRef.update(updateData);
 
         res.status(200).json({ id: req.params.id, ...updateData });
