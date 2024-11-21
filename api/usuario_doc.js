@@ -94,14 +94,16 @@
  *     curl -i -X POST http://localhost:3000/usuario/
  * @apiExample {json} Body de ejemplo:
  * {
- *   "id": "12345" (se signa automatico),
+ *   "id": "12345" (utilizar el id del usuario de firebase auth),
  *   "nombre": "Juan Perez",
  *   "email": "juan.perez@example.com" (debe ser con correo institucional),
  *   "pronombres": "él",
  *   "username": "juanperez",
- *   "carrera": "carrera1",
+ *   "carrera": "carrera1", (id de la carrera seleccionada)
  *   "presentacion": "Hola, soy Juan.",
  *   "contactos": [{"tipo": "email", "valor": "contacto@example.com"}]
+ *   "foto": "ruta_firebase_storage_img.jpg",
+ * 
  * }
  * @apiSuccess {String} id ID del nuevo usuario.
  * @apiSuccessExample {json} Ejemplo de respuesta

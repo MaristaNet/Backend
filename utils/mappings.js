@@ -6,7 +6,10 @@ const mapCarrera = async (usuarioDoc) => {
             // Consulta el documento de `carrera` y obtén sus datos
             const carreraDoc = await usuarioData.carrera.get();
             if (carreraDoc.exists) {
-                usuarioData.carrera = carreraDoc.data(); // Reemplaza la referencia con los datos de `carrera`
+                usuarioData.carrera = {
+                    id: carreraDoc.id,
+                    ...carreraDoc.data()
+                }; // Reemplaza la referencia con los datos de `carrera`
             } else {
                 usuarioData.carrera = null; // O maneja el caso en que `carrera` no existe
             }

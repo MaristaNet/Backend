@@ -40,6 +40,8 @@ router.get('/:id', async (req, res) => {
         }
         const usuario = { id: doc.id, ...doc.data(), };
         usuario.fecha_creacion = TStoDate(usuario.fecha_creacion);
+        const result = await mapCarrera(doc, db);
+        usuario.carrera = result.carrera
         return res.status(200).json(usuario);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -47,9 +49,9 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const {id, presentacion, foto, post, nombre, email, pronombres, username, contactos, carrera } = req.body;
+    const {id, presentacion, foto, nombre, email, pronombres, username,  carrera } = req.body;
     //el usuario nos va a dar un id de carrera, nosotros debemos convertirlo en una referencia
-    if (!presentacion  || !post  || !nombre || !email || !pronombres || !username || !contactos || !carrera) {
+    if (!presentacion  || !nombre || !email || !pronombres || !username || !carrera) {
         return res.status(400).json({ error: 'Faltan datos' });
     }
 
@@ -63,13 +65,13 @@ router.post('/', async (req, res) => {
             presentacion,
             id,
             foto,
-            post,
+            post:[],
             fecha_creacion: timestamp,
             nombre,
             email,
             pronombres,
             username,
-            contactos,
+            contactos:[],
             carrera: carreraRef //Guardamos la referencia de carrera en lugar del ID o una cadena plana
         });
         res.status(201).json({
