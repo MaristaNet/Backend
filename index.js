@@ -75,9 +75,10 @@ app.use('/denuncia', denunciaRouter)
 
 const port = process.env.PORT || 3000
 
+app.use(express.static('doc'));
 app.get('/', (req, res) => {
-  res.send('Hola mundo')
-})
+  res.sendFile(__dirname +'/doc/index.html');
+});
 
 
 app.listen(port, () => {
