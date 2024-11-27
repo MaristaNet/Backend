@@ -3,19 +3,20 @@
  * @apiName GetDenuncias
  * @apiGroup Denuncia
  *
- * @apiQuery {String} [post] Filtrar por ID del post relacionado con la denuncia.
+ * @apiQuery {String} [id_elemento] Filtrar por ID del elemento relacionado con la denuncia.
+ * @apiQuery {String} [tipo] Filtrar por tipo de elemento denunciado (por ejemplo: "post" o "comentario").
  * 
  * @apiExample {curl} Ejemplo de uso:
- *     curl -i http://localhost:3000/denuncia?post=post123
+ *     curl -i http://localhost:3000/denuncia?id_elemento=post123&tipo=post
  *
  * @apiSuccess {Object[]} data Lista de denuncias.
  * @apiSuccess {String} data.id ID de la denuncia.
  * @apiSuccess {String} data.id_usuario ID del usuario que hizo la denuncia.
- * @apiSuccess {String} data.tipo Tipo de elemento denunciado (por ejemplo: "comentario" o "post").
+ * @apiSuccess {String} data.tipo Tipo de elemento denunciado (por ejemplo: "post" o "comentario").
  * @apiSuccess {String} data.id_elemento ID del elemento denunciado.
  * @apiSuccess {String} data.motivo Motivo de la denuncia.
  * @apiSuccess {Date} data.fecha Fecha en la que se realizó la denuncia.
- * @apiSuccess {Number} total Total de denuncias.
+ * @apiSuccess {Number} total Total de denuncias encontradas.
  * 
  * @apiSuccessExample {json} Ejemplo de respuesta:
  *     HTTP/1.1 200 OK
@@ -41,6 +42,7 @@
  *       "total": 2
  *     }
  *
+ * @apiError (Error 400) BadRequest Se requiere al menos un parámetro de filtro: `id_elemento` o `tipo`.
  * @apiError (Error 500) InternalServerError Error interno del servidor.
  */
 
@@ -86,6 +88,6 @@
  *       }
  *     }
  *
- * @apiError (Error 400) BadRequest Faltan datos obligatorios.
+ * @apiError (Error 400) BadRequest Faltan datos obligatorios: `id_usuario`, `tipo`, `id_elemento` o `motivo`.
  * @apiError (Error 500) InternalServerError Error interno del servidor.
  */
